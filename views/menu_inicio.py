@@ -1,9 +1,11 @@
-from utils.tkinter import ventana_default, bloqueo_pantalla_completa
+from utils.tkinter import ventana_default, bloqueo_pantalla_completa_default
 from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
+from views.Iniciar_Sesion import inicio_sesion
+from views.Registrarse import registrarse
 import os
 
-class menu_inicio(ventana_default, bloqueo_pantalla_completa):
+class menu_inicio(ventana_default, bloqueo_pantalla_completa_default):
     """
     Ventana principal del sistema, hereda de ventana_default.
     """
@@ -34,13 +36,13 @@ class menu_inicio(ventana_default, bloqueo_pantalla_completa):
         # Título del sistema
         titulo_frame = ttk.Frame(header)
         titulo_frame.pack(side="left", anchor="center", pady=10)
-        ttk.Label(titulo_frame, text="GIPU", font=("Arial", 18, "bold")).pack(anchor="w")
-        ttk.Label(titulo_frame, text="Gestión de Inscripción y Postulación Universitaria", font=("Arial", 11)).pack(anchor="w")
+        ttk.Label(titulo_frame, text="GIPU", font=("Arial", 18, "bold"), foreground="#2a4f80").pack(anchor="w")
+        ttk.Label(titulo_frame, text="Gestión de Inscripción y Postulación Universitaria", font=("Arial", 11), foreground="#2a4f80").pack(anchor="w")
 
         # Botones de acción (Registrarse / Iniciar Sesión)
         botones_frame = ttk.Frame(header)
         botones_frame.pack(side="right", padx=10)
-        ttk.Button(botones_frame, text="Registrarse", width=15, command=self._registrarse,).pack(side="left", padx=5)
+        ttk.Button(botones_frame, text="Registrarse", width=15, command=self._registrarse).pack(side="left", padx=5)
         ttk.Button(botones_frame, text="Iniciar Sesión", width=15, command=self._iniciar_sesion).pack(side="left", padx=5)
 
         # ─────────────────────────────
@@ -72,11 +74,7 @@ class menu_inicio(ventana_default, bloqueo_pantalla_completa):
     # MÉTODOS DE ACCIÓN
     # ─────────────────────────────
     def _registrarse(self):
-        messagebox.showinfo("Registro", "Aquí se abrirá la ventana de regitro de cuentas")
-        #registro = ventana_registro()
-        #registro.run()
+        registrarse(self)
 
     def _iniciar_sesion(self):
-        messagebox.showinfo("CIniciar Sesion", "Aquí se mostrara la ventana de Inicio de sesion.")
-        #inicio_sesion = ventana_inicio()
-        #inicio_sesion.run()
+        inicio_sesion(self)
