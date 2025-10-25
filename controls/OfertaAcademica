@@ -322,3 +322,4 @@ class OfertaAcademica:
                 f"Facultad: {self._facultad}, Carrera: {self._carrera}, "
                 f"Campus: {self._campus}, Cupos: {self._cupos_disponibles}, "
                 f"Modalidad: {self._modalidad}, Publicada: {self._publicada})")
+    
