@@ -1,7 +1,7 @@
 from utils.tkinter import ventana_modal, bloqueo_pantalla_completa_modal, abrir_derecha_modal
 from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
-from views.Ns import miVentana
+from views.Ns import adminVentana
 import json
 import os
 
@@ -113,7 +113,7 @@ class inicio_sesion (ventana_modal, bloqueo_pantalla_completa_modal, abrir_derec
                         if usuario["Email"] == correo_ingresado and usuario["Contraseña"] == contraseña_ingresada:
                             messagebox.showinfo("Inicio de sesión exitoso", f"¡Bienvenido, {usuario['Nombre']}!")
                             self.destroy()
-                            miVentana(self)
+                            adminVentana(self)
                             return
                     except json.JSONDecodeError:
                         continue
