@@ -1,0 +1,325 @@
+from abc import ABC, abstractmethod
+from typing import Optional, List
+import csv
+import os
+from datetime import datetime
+
+class IOfertaAcademicaRepository(ABC):
+    """Interfaz para el repositorio de OfertaAcademica (inyección de dependencias)"""
+    
+    @abstractmethod
+    def guardar(self, oferta: 'OfertaAcademica') -> None:
+        pass
+    
+    @abstractmethod
+    def actualizar(self, oferta: 'OfertaAcademica') -> None:
+        pass
+    
+    @abstractmethod
+    def eliminar(self, id_oferta: int) -> None:
+        pass
+    
+    @abstractmethod
+    def obtener_por_id(self, id_oferta: int) -> Optional['OfertaAcademica']:
+        pass
+    
+    @abstractmethod
+    def obtener_todas(self) -> List['OfertaAcademica']:
+        pass
+
+
+class OfertaAcademicaCSVRepository(IOfertaAcademicaRepository):
+    """Implementación concreta del repositorio usando CSV"""
+    
+    def __init__(self, archivo_csv: str = "ofertas_academicas.csv"):
+        self.archivo_csv = archivo_csv
+        self._crear_archivo_si_no_existe()
+    
+    def _crear_archivo_si_no_existe(self) -> None:
+        """Crea el archivo CSV con los encabezados si no existe"""
+        if not os.path.exists(self.archivo_csv):
+            with open(self.archivo_csv, 'w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow([
+                    'id_ofertaAcademica',
+                    'facultad',
+                    'carrera', 
+                    'campus',
+                    'cupos_disponibles',
+                    'modalidad',
+                    'publicada',
+                    'fecha_creacion',
+                    'fecha_actualizacion'
+                ])
+    
+    def _leer_todas_ofertas(self) -> List[dict]:
+        """Lee todas las ofertas del archivo CSV"""
+        ofertas = []
+        try:
+            with open(self.archivo_csv, 'r', newline='', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    # Convertir tipos de datos
+                    row['id_ofertaAcademica'] = int(row['id_ofertaAcademica'])
+                    row['cupos_disponibles'] = int(row['cupos_disponibles'])
+                    row['publicada'] = row['publicada'].lower() == 'true'
+                    ofertas.append(row)
+        except FileNotFoundError:
+            pass
+        return ofertas
+    
+    def _escribir_todas_ofertas(self, ofertas: List[dict]) -> None:
+        """Escribe todas las ofertas al archivo CSV"""
+        with open(self.archivo_csv, 'w', newline='', encoding='utf-8') as file:
+            fieldnames = [
+                'id_ofertaAcademica', 'facultad', 'carrera', 'campus',
+                'cupos_disponibles', 'modalidad', 'publicada',
+                'fecha_creacion', 'fecha_actualizacion'
+            ]
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(ofertas)
+    
+    def guardar(self, oferta: 'OfertaAcademica') -> None:
+        """Guarda una nueva oferta en el CSV"""
+        ofertas = self._leer_todas_ofertas()
+        
+        # Verificar si ya existe
+        for oferta_existente in ofertas:
+            if oferta_existente['id_ofertaAcademica'] == oferta.id_ofertaAcademica:
+                raise ValueError(f"Ya existe una oferta con ID {oferta.id_ofertaAcademica}")
+        
+        # Agregar nueva oferta
+        nueva_oferta = {
+            'id_ofertaAcademica': oferta.id_ofertaAcademica,
+            'facultad': oferta.facultad,
+            'carrera': oferta.carrera,
+            'campus': oferta.campus,
+            'cupos_disponibles': oferta.cupos_disponibles,
+            'modalidad': oferta.modalidad,
+            'publicada': oferta.publicada,
+            'fecha_creacion': datetime.now().isoformat(),
+            'fecha_actualizacion': datetime.now().isoformat()
+        }
+        
+        ofertas.append(nueva_oferta)
+        self._escribir_todas_ofertas(ofertas)
+    
+    def actualizar(self, oferta: 'OfertaAcademica') -> None:
+        """Actualiza una oferta existente en el CSV"""
+        ofertas = self._leer_todas_ofertas()
+        encontrada = False
+        
+        for i, oferta_existente in enumerate(ofertas):
+            if oferta_existente['id_ofertaAcademica'] == oferta.id_ofertaAcademica:
+                ofertas[i] = {
+                    'id_ofertaAcademica': oferta.id_ofertaAcademica,
+                    'facultad': oferta.facultad,
+                    'carrera': oferta.carrera,
+                    'campus': oferta.campus,
+                    'cupos_disponibles': oferta.cupos_disponibles,
+                    'modalidad': oferta.modalidad,
+                    'publicada': oferta.publicada,
+                    'fecha_creacion': oferta_existente['fecha_creacion'],  # Mantener fecha original
+                    'fecha_actualizacion': datetime.now().isoformat()
+                }
+                encontrada = True
+                break
+        
+        if not encontrada:
+            raise ValueError(f"No se encontró la oferta con ID {oferta.id_ofertaAcademica}")
+        
+        self._escribir_todas_ofertas(ofertas)
+    
+    def eliminar(self, id_oferta: int) -> None:
+        """Elimina una oferta del CSV"""
+        ofertas = self._leer_todas_ofertas()
+        ofertas_actualizadas = [
+            oferta for oferta in ofertas 
+            if oferta['id_ofertaAcademica'] != id_oferta
+        ]
+        
+        if len(ofertas_actualizadas) == len(ofertas):
+            raise ValueError(f"No se encontró la oferta con ID {id_oferta}")
+        
+        self._escribir_todas_ofertas(ofertas_actualizadas)
+    
+    def obtener_por_id(self, id_oferta: int) -> Optional['OfertaAcademica']:
+        """Obtiene una oferta por su ID"""
+        ofertas = self._leer_todas_ofertas()
+        
+        for oferta_data in ofertas:
+            if oferta_data['id_ofertaAcademica'] == id_oferta:
+                return OfertaAcademica(
+                    id_ofertaAcademica=oferta_data['id_ofertaAcademica'],
+                    facultad=oferta_data['facultad'],
+                    carrera=oferta_data['carrera'],
+                    campus=oferta_data['campus'],
+                    cupos_disponibles=oferta_data['cupos_disponibles'],
+                    modalidad=oferta_data['modalidad'],
+                    repository=self
+                )
+        return None
+    
+    def obtener_todas(self) -> List['OfertaAcademica']:
+        """Obtiene todas las ofertas del CSV"""
+        ofertas_data = self._leer_todas_ofertas()
+        ofertas = []
+        
+        for oferta_data in ofertas_data:
+            oferta = OfertaAcademica(
+                id_ofertaAcademica=oferta_data['id_ofertaAcademica'],
+                facultad=oferta_data['facultad'],
+                carrera=oferta_data['carrera'],
+                campus=oferta_data['campus'],
+                cupos_disponibles=oferta_data['cupos_disponibles'],
+                modalidad=oferta_data['modalidad'],
+                repository=self
+            )
+            if oferta_data['publicada']:
+                oferta.publicar_oferta()
+            ofertas.append(oferta)
+        
+        return ofertas
+
+
+class OfertaAcademica:
+    """Clase que representa una oferta académica en el sistema"""
+    
+    def __init__(self, 
+                 id_ofertaAcademica: int,
+                 facultad: str,
+                 carrera: str,
+                 campus: str,
+                 cupos_disponibles: int,
+                 modalidad: str,
+                 repository: IOfertaAcademicaRepository = None):
+        
+        self._id_ofertaAcademica = id_ofertaAcademica
+        self._facultad = facultad
+        self._carrera = carrera
+        self._campus = campus
+        self._cupos_disponibles = cupos_disponibles
+        self._modalidad = modalidad
+        self._publicada = False
+        self._repository = repository
+    
+    # Encapsulamiento - Getters y Setters
+    @property
+    def id_ofertaAcademica(self) -> int:
+        return self._id_ofertaAcademica
+    
+    @property
+    def facultad(self) -> str:
+        return self._facultad
+    
+    @facultad.setter
+    def facultad(self, value: str) -> None:
+        self._facultad = value
+    
+    @property
+    def carrera(self) -> str:
+        return self._carrera
+    
+    @carrera.setter
+    def carrera(self, value: str) -> None:
+        self._carrera = value
+    
+    @property
+    def campus(self) -> str:
+        return self._campus
+    
+    @campus.setter
+    def campus(self, value: str) -> None:
+        self._campus = value
+    
+    @property
+    def cupos_disponibles(self) -> int:
+        return self._cupos_disponibles
+    
+    @cupos_disponibles.setter
+    def cupos_disponibles(self, value: int) -> None:
+        if value < 0:
+            raise ValueError("Los cupos disponibles no pueden ser negativos")
+        self._cupos_disponibles = value
+    
+    @property
+    def modalidad(self) -> str:
+        return self._modalidad
+    
+    @modalidad.setter
+    def modalidad(self, value: str) -> None:
+        self._modalidad = value
+    
+    @property
+    def publicada(self) -> bool:
+        return self._publicada
+    
+    # Métodos de la clase
+    def registrar_oferta(self) -> bool:
+        """Registra la oferta académica en el sistema"""
+        if self._repository is None:
+            raise ValueError("Repository no configurado para OfertaAcademica")
+        
+        try:
+            self._repository.guardar(self)
+            print(f"Oferta académica {self._id_ofertaAcademica} registrada exitosamente")
+            return True
+        except Exception as e:
+            print(f"Error al registrar oferta: {e}")
+            return False
+    
+    def modificar_oferta(self, **kwargs) -> bool:
+        """Modifica los atributos de la oferta académica"""
+        if self._repository is None:
+            raise ValueError("Repository no configurado para OfertaAcademica")
+        
+        try:
+            # Actualizar atributos permitidos
+            atributos_permitidos = ['facultad', 'carrera', 'campus', 'cupos_disponibles', 'modalidad']
+            for key, value in kwargs.items():
+                if key in atributos_permitidos:
+                    setattr(self, key, value)
+            
+            self._repository.actualizar(self)
+            print(f"Oferta académica {self._id_ofertaAcademica} modificada exitosamente")
+            return True
+        except Exception as e:
+            print(f"Error al modificar oferta: {e}")
+            return False
+    
+    def eliminar_oferta(self) -> bool:
+        """Elimina la oferta académica del sistema"""
+        if self._repository is None:
+            raise ValueError("Repository no configurado para OfertaAcademica")
+        
+        try:
+            self._repository.eliminar(self._id_ofertaAcademica)
+            print(f"Oferta académica {self._id_ofertaAcademica} eliminada exitosamente")
+            return True
+        except Exception as e:
+            print(f"Error al eliminar oferta: {e}")
+            return False
+    
+    def publicar_oferta(self) -> bool:
+        """Publica la oferta académica"""
+        if self._cupos_disponibles <= 0:
+            print("No se puede publicar una oferta sin cupos disponibles")
+            return False
+        
+        self._publicada = True
+        # Si ya está en el sistema, actualizar
+        if self._repository:
+            try:
+                self._repository.actualizar(self)
+            except:
+                pass 
+        print(f"Oferta académica {self._id_ofertaAcademica} publicada exitosamente")
+        return True
+    
+    def __str__(self) -> str:
+        return (f"OfertaAcademica(ID: {self._id_ofertaAcademica}, "
+                f"Facultad: {self._facultad}, Carrera: {self._carrera}, "
+                f"Campus: {self._campus}, Cupos: {self._cupos_disponibles}, "
+                f"Modalidad: {self._modalidad}, Publicada: {self._publicada})")
+    
