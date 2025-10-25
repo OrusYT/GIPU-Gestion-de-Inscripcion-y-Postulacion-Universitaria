@@ -1,11 +1,13 @@
 from utils.tkinter import ventana_modal, bloqueo_pantalla_completa_modal
 from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
+from views.Iniciar_Sesion import inicio_sesion
+import json
 import os
 
 class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
     def __init__(self, master=None):
-        super().__init__(titulo="GIPU - Registrarse", ancho=600, alto=750, master=master)
+        super().__init__(titulo="GIPU - Registrarse", ancho=600, alto=700, master=master)
         self.logo = None
         self._crear_contenido()
         self.transient(master)
@@ -130,8 +132,8 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
         # Botones de acción
         botones_frame = ttk.Frame(final)
         botones_frame.pack(side="top",anchor="center", padx=10)
-        ttk.Button(botones_frame, text="Cancelar", width=15, command= self.destroy).pack(side="left", padx=5)
-        ttk.Button(botones_frame, text="Aceptar", width=15, command= self._aceptar).pack(side="left", padx=5)
+        ttk.Button(botones_frame, text="Cancelar", width=15, command= self.destroy).pack(side="left", padx=5,pady=0.01)
+        ttk.Button(botones_frame, text="Aceptar", width=15, command= self._aceptar).pack(side="left", padx=5,pady=0.01)
 
     def _iniciar_sesion(self, event=None):
         from views.Iniciar_Sesion import inicio_sesion
@@ -153,6 +155,40 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
         else:
             self.repetir_contraseña.config(show="")
             self.mostrar_contra_repetir.config(text="Ocultar Contraseña")
+    def guardar_datos(self):
+        datos = {
+            "Email": self.email.get(),
+            "Contraseña": self.contraseña.get(),
+            "Nombre": self.nombre.get(),
+            "Apellido": self.apellido.get(),
+            "C.I.": self.ci.get(),
+            "Dirección": self.direccion.get(),
+            "Teléfono": self.telefono.get(),
+            "Género": self.genero.get()
+        }
 
+        with open("datos_registro.json", "a", encoding='utf-8') as archivo:
+            archivo.write(json.dumps(datos) + "\n")
     def _aceptar(self):
-        messagebox.showinfo("PERATEEEEE!!!!!!", "AUN NO HAY LOGICO CONFIGURADO XD")
+        campos={
+            "Nombre":self.nombre.get(),
+            "Apellido":self.apellido.get(),
+            "C.I":self.ci.get(),
+            "Email":self.email.get(),
+            "Contraseña":self.contraseña.get(),
+            "Direccion":self.direccion.get(),
+            "Telefono":self.telefono.get(),
+            "Genero":self.genero.get(),
+            "Repetir Contraseña":self.repetir_contraseña.get()
+        }
+        for campo, valor in campos.items():
+            if not valor.strip():
+                messagebox.showwarning("Campos vacíos", "Por favor, complete todos los campos.")
+                return
+            if campos["Contraseña"] != campos["Repetir Contraseña"]:
+                messagebox.showwarning("Contraseñas no coinciden", "Las contraseñas ingresadas no coinciden. Por favor, inténtelo de nuevo.")
+                return
+        self.guardar_datos()
+        messagebox.showinfo("Registro exitoso", "¡Te has registrado correctamente!")
+        inicio_sesion(self)
+        self.destroy()

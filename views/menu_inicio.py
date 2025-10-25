@@ -3,6 +3,7 @@ from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
 from views.Iniciar_Sesion import inicio_sesion
 from views.Registrarse import registrarse
+
 import os
 
 class menu_inicio(ventana_default, bloqueo_pantalla_completa_default):
@@ -44,7 +45,6 @@ class menu_inicio(ventana_default, bloqueo_pantalla_completa_default):
         botones_frame.pack(side="right", padx=10)
         ttk.Button(botones_frame, text="Registrarse", width=15, command=self._registrarse).pack(side="left", padx=5)
         ttk.Button(botones_frame, text="Iniciar Sesión", width=15, command=self._iniciar_sesion).pack(side="left", padx=5)
-
         # ─────────────────────────────
         # CUERPO PRINCIPAL
         # ─────────────────────────────

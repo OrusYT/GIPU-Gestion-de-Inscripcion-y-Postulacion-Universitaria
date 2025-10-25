@@ -1,6 +1,8 @@
 from utils.tkinter import ventana_modal, bloqueo_pantalla_completa_modal, abrir_derecha_modal
 from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
+from views.Ns import miVentana
+import json
 import os
 
 class inicio_sesion (ventana_modal, bloqueo_pantalla_completa_modal, abrir_derecha_modal):
@@ -98,4 +100,26 @@ class inicio_sesion (ventana_modal, bloqueo_pantalla_completa_modal, abrir_derec
             self.mostrar_contra.config(text="Ocultar Contraseña")
 
     def _aceptar(self):
-        messagebox.showinfo("PERATEEEEE!!!!!!", "AUN NO HAY LOGICO CONFIGURADO XD")
+        correo_ingresado = self.correo.get().strip()
+        contraseña_ingresada = self.contraseña.get().strip()
+        if not correo_ingresado or not contraseña_ingresada:
+            messagebox.showwarning("Campos vacíos", "Por favor, complete todos los campos.")
+            return
+        try:
+            with open("datos_registro.json", "r", encoding='utf-8') as archivo:
+                for linea in archivo:
+                    try:
+                        usuario = json.loads(linea)
+                        if usuario["Email"] == correo_ingresado and usuario["Contraseña"] == contraseña_ingresada:
+                            messagebox.showinfo("Inicio de sesión exitoso", f"¡Bienvenido, {usuario['Nombre']}!")
+                            self.destroy()
+                            miVentana(self)
+                            return
+                    except json.JSONDecodeError:
+                        continue
+            messagebox.showerror("Error de autenticación", "Correo o contraseña incorrectos.")
+        except FileNotFoundError:
+            messagebox.showerror("Archivo no encontrado", "No se encontraron registros de usuarios.")
+
+
+            
