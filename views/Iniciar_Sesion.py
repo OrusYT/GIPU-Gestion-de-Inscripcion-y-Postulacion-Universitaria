@@ -1,7 +1,7 @@
 from utils.tkinter import ventana_modal, bloqueo_pantalla_completa_modal, abrir_derecha_modal
 from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
-from views.Ns import adminVentana
+from views.admin.Admin_menu import adminVentana
 import json
 import os
 
@@ -9,9 +9,10 @@ class inicio_sesion (ventana_modal, bloqueo_pantalla_completa_modal, abrir_derec
     """
     Ventana principal de Inicio de sesion, hereda de modelo_modal.
     """
-    def __init__(self, master=None):
-        super().__init__(titulo="GIPU - Iniciar Sesion", ancho=400, alto=550, master=master)
+    def __init__(self, master=None, iconos=None):
+        super().__init__(titulo="GIPU - Iniciar Sesion", ancho=400, alto=550, master=master, iconos= iconos)
         self.logo = None
+        self.master_window = master
         self._crear_contenido()
         self.after(100, self._posicionar_a_derecha)
         self.transient(master)
@@ -99,27 +100,49 @@ class inicio_sesion (ventana_modal, bloqueo_pantalla_completa_modal, abrir_derec
             self.contraseña.config(show="")
             self.mostrar_contra.config(text="Ocultar Contraseña")
 
-    def _aceptar(self):
+    def _aceptar(self, event=None):
         correo_ingresado = self.correo.get().strip()
         contraseña_ingresada = self.contraseña.get().strip()
         if not correo_ingresado or not contraseña_ingresada:
             messagebox.showwarning("Campos vacíos", "Por favor, complete todos los campos.")
             return
+        usuario_encontrado = False
+
         try:
-            with open("datos_registro.json", "r", encoding='utf-8') as archivo:
+            with open("data/admin.json", "r", encoding='utf-8') as archivo:
                 for linea in archivo:
                     try:
                         usuario = json.loads(linea)
-                        if usuario["Email"] == correo_ingresado and usuario["Contraseña"] == contraseña_ingresada:
-                            messagebox.showinfo("Inicio de sesión exitoso", f"¡Bienvenido, {usuario['Nombre']}!")
+                        if usuario["Email"] == correo_ingresado.lower() and usuario["Contraseña"] == contraseña_ingresada:
+                            messagebox.showinfo("Inicio de sesión exitoso", f"¡Bienvenido, {usuario['Nombre']} {usuario['Apellido']}!")
                             self.destroy()
-                            adminVentana(self)
+                            if self.master_window:
+                                self.master_window.destroy()
+                            adminVentana()
+                            usuario_encontrado = True
                             return
                     except json.JSONDecodeError:
                         continue
-            messagebox.showerror("Error de autenticación", "Correo o contraseña incorrectos.")
         except FileNotFoundError:
-            messagebox.showerror("Archivo no encontrado", "No se encontraron registros de usuarios.")
+            pass
 
-
-            
+        if not usuario_encontrado:
+            try:
+                with open("data/datos_registro.json", "r", encoding='utf-8') as archivo:
+                    for linea in archivo:
+                        try:
+                            usuario = json.loads(linea)
+                            if usuario["Email"] == correo_ingresado.lower() and usuario["Contraseña"] == contraseña_ingresada:
+                                messagebox.showinfo("Inicio de sesión exitoso", f"¡Bienvenido, {usuario['Nombre']} {usuario['Apellido']}!")
+                                self.destroy()
+                                if self.master_window:
+                                    self.master_window.destroy()
+                                
+                                usuario_encontrado = True
+                                return
+                        except json.JSONDecodeError:
+                            continue
+            except FileNotFoundError:
+                pass
+        if not usuario_encontrado:
+            messagebox.showerror("Error de autenticación", "Correo o contraseña incorrectos.")

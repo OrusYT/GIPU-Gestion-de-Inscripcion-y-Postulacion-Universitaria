@@ -4,7 +4,7 @@ from tkinter import *
 
 class ventana_default(tk.Tk):
     # Se crea la clase de la ventana default, hereda de Tkinter.
-    def __init__(self, titulo="Sistema de Inscripción y Postulación", ancho=800, alto=600):
+    def __init__(self, titulo="Sistema de Inscripción y Postulación", ancho=800, alto=600, iconos=None):
         super().__init__()
         self.title(titulo)
 
@@ -16,6 +16,11 @@ class ventana_default(tk.Tk):
         # Fondo y estilos generales
         self.config(bg="#f0f0f0")
         self._configurar_estilos()
+
+        #iconos
+        if iconos:
+            iconos.cargar(self)
+
 
     # ─────────────────────────────
     # Posicionar ventana
@@ -57,7 +62,7 @@ class bloqueo_pantalla_completa_default(tk.Tk):
         self.resizable(False, False)
 
 class ventana_modal(tk.Toplevel):
-    def __init__(self, titulo="modelo", ancho=800, alto=600, master=None):
+    def __init__(self, titulo="modelo", ancho=800, alto=600, master=None, iconos=None):
         super().__init__(master)
         self.title(titulo)
 
@@ -70,6 +75,10 @@ class ventana_modal(tk.Toplevel):
         self.config(bg="#f0f0f0")
         self._configurar_estilos()
     
+        #iconos
+        if iconos:
+            iconos.cargar(self)
+
     def _centrar_ventana(self):
         pantalla_ancho = self.winfo_screenwidth()
         pantalla_alto = self.winfo_screenheight()

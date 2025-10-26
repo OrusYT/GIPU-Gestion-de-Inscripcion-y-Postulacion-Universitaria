@@ -6,8 +6,8 @@ import json
 import os
 
 class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
-    def __init__(self, master=None):
-        super().__init__(titulo="GIPU - Registrarse", ancho=600, alto=700, master=master)
+    def __init__(self, master=None, iconos=None):
+        super().__init__(titulo="GIPU - Registrarse", ancho=600, alto=750, master=master, iconos= iconos)
         self.logo = None
         self._crear_contenido()
         self.transient(master)
@@ -155,6 +155,7 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
         else:
             self.repetir_contraseña.config(show="")
             self.mostrar_contra_repetir.config(text="Ocultar Contraseña")
+
     def guardar_datos(self):
         datos = {
             "Email": self.email.get(),
@@ -167,8 +168,9 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
             "Género": self.genero.get()
         }
 
-        with open("datos_registro.json", "a", encoding='utf-8') as archivo:
+        with open("data/datos_registro.json", "a", encoding='utf-8') as archivo:
             archivo.write(json.dumps(datos) + "\n")
+
     def _aceptar(self):
         campos={
             "Nombre":self.nombre.get(),

@@ -3,15 +3,14 @@ from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
 from views.Iniciar_Sesion import inicio_sesion
 from views.Registrarse import registrarse
-
 import os
 
 class menu_inicio(ventana_default, bloqueo_pantalla_completa_default):
     """
     Ventana principal del sistema, hereda de ventana_default.
     """
-    def __init__(self):
-        super().__init__(titulo="GIPU - Gestión de Inscripción y Postulación Universitaria", ancho=900, alto=600)
+    def __init__(self, iconos=None):
+        super().__init__(titulo="GIPU - Gestión de Inscripción y Postulación Universitaria", ancho=900, alto=600, iconos= iconos)
         self.logo = None
         self._crear_contenido()
 
@@ -78,3 +77,6 @@ class menu_inicio(ventana_default, bloqueo_pantalla_completa_default):
 
     def _iniciar_sesion(self):
         inicio_sesion(self)
+    
+    def _cerrar_ventana(self):
+        self.destroy()
