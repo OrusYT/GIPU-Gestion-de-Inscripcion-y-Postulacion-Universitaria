@@ -16,7 +16,7 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
 
     def _crear_contenido(self):
         frame = ttk.Frame(self, padding=10)
-        frame.pack(expand=True, fill="both")
+        frame.pack(expand=False, fill="both")
 
         # ─────────────────────────────
         # ENCABEZADO
@@ -28,10 +28,10 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
         # CUERPO PRINCIPAL
         # ─────────────────────────────
         cuerpo_contenedor = ttk.Frame(frame)
-        cuerpo_contenedor.pack(expand=True, fill="both", pady=10)
+        cuerpo_contenedor.pack(expand=False, fill="both", pady=10)
 
         cuerpo_centro = ttk.Frame(cuerpo_contenedor)
-        cuerpo_centro.pack(expand=True)
+        cuerpo_centro.pack(expand=False)
 
         cuerpo_d = ttk.Frame(cuerpo_centro)
         cuerpo_d.pack(fill="y", pady=5, padx=15, side="right")
@@ -42,7 +42,7 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
         # FINAL
         # ─────────────────────────────
         final = ttk.Frame(frame)
-        final.pack(fill="x", pady=(20,10), side="bottom")
+        final.pack(fill="x", pady=(30,20), side="bottom")
 
         # Cargar logo
         logo_path = os.path.join("assets", "img", "Logo_GIPU.png")
@@ -132,8 +132,8 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
         # Botones de acción
         botones_frame = ttk.Frame(final)
         botones_frame.pack(side="top",anchor="center", padx=10)
-        ttk.Button(botones_frame, text="Cancelar", width=15, command= self.destroy).pack(side="left", padx=5,pady=0.01)
-        ttk.Button(botones_frame, text="Aceptar", width=15, command= self._aceptar).pack(side="left", padx=5,pady=0.01)
+        ttk.Button(botones_frame, text="Cancelar", width=15, command= self.destroy).pack(side="left", padx=5,pady=1)
+        ttk.Button(botones_frame, text="Aceptar", width=15, command= self._aceptar).pack(side="left", padx=5,pady=1)
 
     def _iniciar_sesion(self, event=None):
         from views.Iniciar_Sesion import inicio_sesion
@@ -167,9 +167,17 @@ class registrarse (ventana_modal, bloqueo_pantalla_completa_modal):
             "Teléfono": self.telefono.get(),
             "Género": self.genero.get()
         }
+        correo = datos["Email"].strip().lower()
 
-        with open("data/datos_registro.json", "a", encoding='utf-8') as archivo:
-            archivo.write(json.dumps(datos) + "\n")
+        try:
+            if correo.endswith("@system.com"):
+                with open("data/admin.json", "a", encoding='utf-8') as file:
+                    file.write(json.dumps(datos) + "\n")
+            else:
+                with open("data/datos_registro.json", "a", encoding='utf-8') as archivo:
+                    archivo.write(json.dumps(datos) + "\n")
+        except Exception as e:
+            messagebox.showerror("Error al guardar", f"No se pudo guardar el registro: {e}")
 
     def _aceptar(self):
         campos={
