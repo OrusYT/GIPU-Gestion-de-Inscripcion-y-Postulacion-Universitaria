@@ -32,7 +32,8 @@ class OfertaAcademicaCSVRepository(IOfertaAcademicaRepository):
     """Implementación concreta del repositorio usando CSV"""
     
     def __init__(self, archivo_csv: str = "ofertas_academicas.csv"):
-        self.archivo_csv = archivo_csv
+        with open("GIPU-Gestion-de-Inscripcion-y-Postulacion-Universitaria\documento_oferta\ 102_ULEAM_OFERTASEGMENTADA_IIPA-2025.CSV","r",encoding='utf-8') as archivo_csv:
+            self.archivo_csv = archivo_csv
         self._crear_archivo_si_no_existe()
     
     def _crear_archivo_si_no_existe(self) -> None:

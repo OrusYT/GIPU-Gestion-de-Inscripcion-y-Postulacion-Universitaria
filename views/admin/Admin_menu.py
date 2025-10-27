@@ -82,4 +82,6 @@ class Admin_menu:
         print("Eliminar cuenta: ")
         print("Modificar cuenta: ")
         print()
+    def _contenedor_oferta(self):
+        pass
 
