@@ -2,6 +2,7 @@ from utils.tkinter import ventana_modal, bloqueo_pantalla_completa_modal, abrir_
 from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
 from views.admin.Admin_menu import adminVentana
+from views.estudiante_menu import estudianteventana
 import json
 import os
 
@@ -14,7 +15,7 @@ class inicio_sesion (ventana_modal, bloqueo_pantalla_completa_modal, abrir_derec
         self.logo = None
         self.master_window = master
         self._crear_contenido()
-        self.after(100, self._posicionar_a_derecha)
+   
         self.transient(master)
         self.grab_set()
         self.focus_set()
@@ -108,23 +109,7 @@ class inicio_sesion (ventana_modal, bloqueo_pantalla_completa_modal, abrir_derec
             return
         usuario_encontrado = False
 
-        try:
-            with open("data/admin.json", "r", encoding='utf-8') as archivo:
-                for linea in archivo:
-                    try:
-                        usuario = json.loads(linea)
-                        if usuario["Email"] == correo_ingresado.lower() and usuario["Contraseña"] == contraseña_ingresada:
-                            messagebox.showinfo("Inicio de sesión exitoso", f"¡Bienvenido, {usuario['Nombre']} {usuario['Apellido']}!")
-                            self.destroy()
-                            if self.master_window:
-                                self.master_window.destroy()
-                            adminVentana()
-                            usuario_encontrado = True
-                            return
-                    except json.JSONDecodeError:
-                        continue
-        except FileNotFoundError:
-            pass
+
 
         if not usuario_encontrado:
             try:
@@ -137,7 +122,25 @@ class inicio_sesion (ventana_modal, bloqueo_pantalla_completa_modal, abrir_derec
                                 self.destroy()
                                 if self.master_window:
                                     self.master_window.destroy()
-                                
+                                estudianteventana()
+                                usuario_encontrado = True
+                                return
+                        except json.JSONDecodeError:
+                            continue
+            except FileNotFoundError:
+                pass
+        if not usuario_encontrado:
+            try:
+                with open("data/admin.json", "r", encoding='utf-8') as archivo:
+                    for linea in archivo:
+                        try:
+                            usuario = json.loads(linea)
+                            if usuario["Email"] == correo_ingresado.lower() and usuario["Contraseña"] == contraseña_ingresada:
+                                messagebox.showinfo("Inicio de sesión exitoso", f"¡Bienvenido, {usuario['Nombre']} {usuario['Apellido']}!")
+                                self.destroy()
+                                if self.master_window:
+                                    self.master_window.destroy()
+                                adminVentana()
                                 usuario_encontrado = True
                                 return
                         except json.JSONDecodeError:

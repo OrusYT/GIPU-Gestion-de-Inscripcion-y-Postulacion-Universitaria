@@ -5,12 +5,12 @@ import tkinter as tk
 from abc import ABCMeta, abstractmethod
 import os, json
 
-class adminVentana(ventana_default):
+class adminVentana(ventana_default, bloqueo_pantalla_completa_default,ventana_modal):
     def __init__(self, master=None, iconos=None):
         super().__init__(titulo="GIPU - Panel de Administración", ancho=800, alto=600, iconos= iconos)
         self.logo = None
         self._crear_contenido()
-
+        self.abrir_modal()
     def _crear_contenido(self):
         # Frame principal
         frame = ttk.Frame(self, padding=30)
@@ -58,12 +58,7 @@ class herramienta_modal(ventana_modal,bloqueo_pantalla_completa_default):
 
 class Admin_menu(metaclass=ABCMeta):
     #Idea esto se usara para cuando se inicie por primera vez el administrador tendra que colocar la universidad
-    """if not os.path.exists("config\settings.json"):
-            Instituto = {
-                "Universidad": "Universidad Laica Eloy Alfaro de Manabi"
-            }
-            with open("settings.json", "w", encoding="utf-8") as archivo:
-                json.dump(Instituto, archivo, indent=4)"""
+
     def Gestionar_inscripciones(self):
         print("Gestionar inscripciones")
         print("Ingrese un periodo: ")
@@ -93,8 +88,3 @@ class Admin_menu(metaclass=ABCMeta):
         print("Modificar cuenta: ")
         print()
 
-menu = Admin_menu()
-menu.Gestionar_inscripciones()
-menu.Gestionar_postulaciones()
-menu.Gestionar_usuarios()
-menu.Gestionar_administradores()
