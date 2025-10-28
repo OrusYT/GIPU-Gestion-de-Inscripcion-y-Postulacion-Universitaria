@@ -2,10 +2,9 @@ from utils.tkinter import ventana_default, bloqueo_pantalla_completa_default, ve
 from utils.tkinter import PhotoImage, messagebox, ttk
 from utils.tkinter import *
 import tkinter as tk
-from abc import ABCMeta, abstractmethod
-import os, json
+import os, json,csv
 
-class adminVentana(ventana_default, bloqueo_pantalla_completa_default,ventana_modal):
+class adminVentana(ventana_default,ventana_modal):
     def __init__(self, master=None, iconos=None):
         super().__init__(titulo="GIPU - Panel de Administración", ancho=800, alto=600, iconos= iconos)
         self.logo = None
@@ -13,12 +12,13 @@ class adminVentana(ventana_default, bloqueo_pantalla_completa_default,ventana_mo
         self.abrir_modal()
     def _crear_contenido(self):
         # Frame principal
-        frame = ttk.Frame(self, padding=30)
-        frame.pack(expand=True, fill="both")
+        
+        self.frame = ttk.Frame(self, padding=30)
+        self.frame.pack(expand=False, fill="both")
         # ─────────────────────────────
         # ENCABEZADO
         # ─────────────────────────────
-        header = ttk.Frame(frame)
+        header = ttk.Frame(self.frame)
         header.pack(fill="x", pady=10)
         # Cargar logo
         logo_path = os.path.join("assets", "img", "Logo_GIPU.png")
@@ -32,8 +32,26 @@ class adminVentana(ventana_default, bloqueo_pantalla_completa_default,ventana_mo
         titulo_frame.pack(side="left", anchor="center", pady=10)
         ttk.Label(titulo_frame, text="GIPU", font=("Arial", 20, "bold"), foreground="#2a4f80").pack(anchor="w")
         ttk.Label(titulo_frame, text="Panel de Administracion", font=("Arial", 18), foreground="#2a4f80").pack(anchor="w")
-        boton = tk.Button(frame, text="Abrir herramientas", font=("Arial", 12), command=self.abrir_modal)
-        boton.pack(pady=20)
+        boton = tk.Button(self.frame, text="Abrir herramientas", font=("Arial", 12), command=self.abrir_modal)
+        boton.pack(pady=5)
+        self._contenedor()
+    def _contenedor(self):
+        contFrame = ttk.Frame(self.frame, padding=15)
+        contFrame.pack(fill="both", expand=True, pady=20)
+
+        texto = tk.Text(contFrame, font=("Consolas", 14), wrap="none", height=20)
+        texto.pack(expand=True, fill="both")
+
+
+        with open('D:\\proyecto_tercer_semestre_poo\\GIPU-Gestion-de-Inscripcion-y-Postulacion-Universitaria\\documento_oferta\\oferta.csv', 'r', newline='', encoding='utf-8') as file:
+            lol = csv.reader(file, delimiter=";")
+            for fila in lol:
+                texto.insert("end", "   ".join(fila) + "\n")
+        texto.config(state="disabled")
+
+
+
+
     def abrir_modal(self):
         herramienta_modal(self)
     
@@ -51,7 +69,8 @@ class herramienta_modal(ventana_modal,bloqueo_pantalla_completa_default):
         inscripcionboton=tk.Button(self.frame, text="Gestionar Inscripciones", command=self.admin_menu.Gestionar_inscripciones)
         inscripcionboton.pack(pady=10)
         cerrar_boton = tk.Button(self.frame, text="Cerrar", command=self.destroy)
-        cerrar_boton.pack(pady=20)
+        cerrar_boton.pack(pady=5)
+
 
 
 class Admin_menu:
