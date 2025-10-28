@@ -40,17 +40,14 @@ class adminVentana(ventana_default,ventana_modal):
         contFrame.pack(fill="both", expand=True, pady=20)
 
         texto = tk.Text(contFrame, font=("Consolas", 14), wrap="none", height=20)
-        texto.pack(expand=True, fill="both")
+        texto.pack( fill="both")
 
-
-        with open('D:\\proyecto_tercer_semestre_poo\\GIPU-Gestion-de-Inscripcion-y-Postulacion-Universitaria\\documento_oferta\\oferta.csv', 'r', newline='', encoding='utf-8') as file:
-            lol = csv.reader(file, delimiter=";")
-            for fila in lol:
+        archivo_oferta=os.path.join("data","oferta.csv")
+        with open(archivo_oferta, 'r', newline='', encoding='utf-8') as file:
+            oferta = csv.reader(file, delimiter=";")
+            for fila in oferta:
                 texto.insert("end", "   ".join(fila) + "\n")
         texto.config(state="disabled")
-
-
-
 
     def abrir_modal(self):
         herramienta_modal(self)
@@ -58,12 +55,11 @@ class adminVentana(ventana_default,ventana_modal):
 class herramienta_modal(ventana_modal,bloqueo_pantalla_completa_default):
     def __init__(self, master=None):
         super().__init__(titulo="Herramientas de Administración", ancho=400, alto=300, master=master)
-        
         self._crear_contenido()
     def _crear_contenido(self):
-        self.admin_menu = Admin_menu()
         self.frame = ttk.Frame(self, padding=10)
         self.frame.pack(expand=True, fill="both")
+        self.admin_menu = Admin_menu(self.frame)
         titulo = tk.Label(self.frame, text="Herramientas de Administración", font=("Arial", 16, "bold"))
         titulo.pack(pady=20)
         inscripcionboton=tk.Button(self.frame, text="Gestionar Inscripciones", command=self.admin_menu.Gestionar_inscripciones)
@@ -71,13 +67,12 @@ class herramienta_modal(ventana_modal,bloqueo_pantalla_completa_default):
         cerrar_boton = tk.Button(self.frame, text="Cerrar", command=self.destroy)
         cerrar_boton.pack(pady=5)
 
-
-
 class Admin_menu:
-    #Idea esto se usara para cuando se inicie por primera vez el administrador tendra que colocar la universidad
-
+    def __init__(self,frame):
+        self.frame=frame
     def Gestionar_inscripciones(self):
-        messagebox.showinfo("Gestionar Inscripciones", "Funcionalidad en desarrollo.")
+        texto2=tk.Label(self.frame,text="hola mundo",font=("Arial",16,"bold"))
+        texto2.pack(pady=10)
 
     def Gestionar_postulaciones(self):
         print("Gestionar postulaciones")
