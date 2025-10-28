@@ -33,10 +33,8 @@ class estudianteventana(ventana_default):
                 logo_label.pack(side="left", padx=(10, 15))
             except Exception as e:
                 print("Error cargando imagen:", e)
-        # fallback: mostrar texto o un label vacío
                 ttk.Label(header, text="[Logo]").pack(side="left", padx=(10,15))
         else:
-            # ruta no existe: fallback visible en la UI para que sepas que no hay imagen
             ttk.Label(header, text="[Logo no encontrado]").pack(side="left", padx=(10,15))
 
 
@@ -65,11 +63,3 @@ class herramienta_modal(ventana_modal,bloqueo_pantalla_completa_default):
         self.verificar_registrounico()
         self.salir()
 
-    def agregar_postulacion(self ):
-
-        print("d")
-    
-    def verificar_registrounico(self):
-        print("d")
-    def salir():
-        print("d")
