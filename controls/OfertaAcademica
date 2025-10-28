@@ -39,9 +39,10 @@ class IOfertaAcademicaRepository(ABC):
 class OfertaAcademicaCSVRepository(IOfertaAcademicaRepository):
     """Implementación concreta del repositorio usando el CSV existente"""
     
-    def __init__(self, archivo_csv: str = "oferta.csv"):
-        self.archivo_csv = archivo_csv
-        self._verificar_archivo()
+    def __init__(self, archivo_csv: str = "ofertas_academicas.csv"):
+        with open("GIPU-Gestion-de-Inscripcion-y-Postulacion-Universitaria\documento_oferta\oferta.CSV","r",encoding='utf-8') as archivo_csv:
+            self.archivo_csv = archivo_csv
+        self._crear_archivo_si_no_existe()
     
     def _verificar_archivo(self) -> None:
         """Verifica que el archivo CSV exista"""
@@ -486,9 +487,8 @@ class OfertaAcademica:
         return self._cus_total_cupos
     
     def __str__(self) -> str:
-        return (f"OfertaAcademica(ID: {self._ofa_id}, "
-                f"Carrera: {self._car_nombre_carrera}, "
-                f"Campus: {self._can_nombre}, "
-                f"Modalidad: {self._modalidad}, "
-                f"Jornada: {self._jornada}, "
-                f"Cupos Totales: {self._cus_total_cupos})")
+        return (f"OfertaAcademica(ID: {self._id_ofertaAcademica}, "
+                f"Facultad: {self._facultad}, Carrera: {self._carrera}, "
+                f"Campus: {self._campus}, Cupos: {self._cupos_disponibles}, "
+                f"Modalidad: {self._modalidad}, Publicada: {self._publicada})")
+#no se que pajo
